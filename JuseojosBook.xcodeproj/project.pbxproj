@@ -14,7 +14,7 @@
 		E997DAF02DF93F4000CF1400 /* Exceptions for "JuseojosBook" folder in "JuseojosBook" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				Application/Info.plist,
 			);
 			target = E997DADD2DF93F3E00CF1400 /* JuseojosBook */;
 		};
