@@ -22,7 +22,7 @@ class BookViewController: UIViewController {
 		super.viewDidLoad()
 		bookViewModel.bookPublisher?.sink { [weak self] bookInform in
 			guard let self else { return }
-			self.bookView.titleLabel.text = bookInform.title
+			self.bookView.configure(book: bookInform)
 		}.store(in: &cancellables)
 
 	}
