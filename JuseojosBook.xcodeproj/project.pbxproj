@@ -6,15 +6,20 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E93866E02DFBCA5200227101 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E93866DF2DFBCA5200227101 /* SnapKit */; };
+		E93866E32DFBCB0500227101 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = E93866E22DFBCB0500227101 /* Then */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		E997DADE2DF93F3E00CF1400 /* JuseojosBook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JuseojosBook.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		E997DAF02DF93F4000CF1400 /* Exceptions for "JuseojosBook" folder in "JuseojosBook" target */ = {
+		E93866E52DFBF8C200227101 /* Exceptions for "JuseojosBook" folder in "JuseojosBook" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				Application/Info.plist,
 			);
 			target = E997DADD2DF93F3E00CF1400 /* JuseojosBook */;
 		};
@@ -24,7 +29,7 @@
 		E997DAE02DF93F3E00CF1400 /* JuseojosBook */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				E997DAF02DF93F4000CF1400 /* Exceptions for "JuseojosBook" folder in "JuseojosBook" target */,
+				E93866E52DFBF8C200227101 /* Exceptions for "JuseojosBook" folder in "JuseojosBook" target */,
 			);
 			path = JuseojosBook;
 			sourceTree = "<group>";
@@ -36,6 +41,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E93866E02DFBCA5200227101 /* SnapKit in Frameworks */,
+				E93866E32DFBCB0500227101 /* Then in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +85,8 @@
 			);
 			name = JuseojosBook;
 			packageProductDependencies = (
+				E93866DF2DFBCA5200227101 /* SnapKit */,
+				E93866E22DFBCB0500227101 /* Then */,
 			);
 			productName = JuseojosBook;
 			productReference = E997DADE2DF93F3E00CF1400 /* JuseojosBook.app */;
@@ -107,6 +116,10 @@
 			);
 			mainGroup = E997DAD52DF93F3E00CF1400;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				E93866DE2DFBCA5200227101 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				E93866E12DFBCB0500227101 /* XCRemoteSwiftPackageReference "Then" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E997DADF2DF93F3E00CF1400 /* Products */;
 			projectDirPath = "";
@@ -147,7 +160,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 95366L65VG;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = JuseojosBook/Info.plist;
+				INFOPLIST_FILE = JuseojosBook/Application/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -178,7 +191,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 95366L65VG;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = JuseojosBook/Info.plist;
+				INFOPLIST_FILE = JuseojosBook/Application/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -253,6 +266,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = /Users/seongjuncho/nbc/juseojoBook/JuseojosBook/Application/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -311,6 +325,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = /Users/seongjuncho/nbc/juseojoBook/JuseojosBook/Application/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -343,6 +358,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E93866DE2DFBCA5200227101 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+		E93866E12DFBCB0500227101 /* XCRemoteSwiftPackageReference "Then" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devxoul/Then";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E93866DF2DFBCA5200227101 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E93866DE2DFBCA5200227101 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		E93866E22DFBCB0500227101 /* Then */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E93866E12DFBCB0500227101 /* XCRemoteSwiftPackageReference "Then" */;
+			productName = Then;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E997DAD62DF93F3E00CF1400 /* Project object */;
 }
