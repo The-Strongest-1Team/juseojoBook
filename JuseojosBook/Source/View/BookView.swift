@@ -137,12 +137,36 @@ class BookView: UIView {
 		$0.text = "Chapters"
 	}
 
+	let summaryButton = UIButton().then {
+		$0.setTitle("더 보기", for: .normal)
+		$0.setTitle("접기", for: .selected)
+		$0.setTitleColor(.systemBlue, for: .normal)
+		$0.isHidden = true
+		if UserDefaults.standard.bool(forKey: "isOpenSummary") {
+			$0.isSelected = true
+		} else {
+			$0.isSelected = false
+		}
+	}
+
+	var summaryString = "" {
+		willSet(newVal) {
+			DispatchQueue.main.async {
+				if newVal.count >= 450 {
+					self.summaryButton.isHidden = false
+				} else {
+					self.summaryButton.isHidden = true
+				}
+			}
+		}
+	}
 
 	override init(frame: CGRect) {
 		super.init(frame: frame)
 
 		self.backgroundColor = .white
-
+		summaryButton.addTarget(self, action: #selector(tapSummaryButton), for: .touchUpInside)
+		
 		addSubview(titleLabel)
 		addSubview(seriesView)
 		seriesView.addSubview(seriesButton)
@@ -175,6 +199,8 @@ class BookView: UIView {
 
 		bookScrollView.addSubview(chapterStackView)
 		chapterStackView.addArrangedSubview(chapterTitleLabel)
+
+		addSubview(summaryButton)
 
 		titleLabel.snp.makeConstraints { make in
 			make.top.equalTo(self.safeAreaLayoutGuide).inset(10)
@@ -229,6 +255,11 @@ class BookView: UIView {
 			make.leading.trailing.equalTo(self).inset(20)
 			make.bottom.equalToSuperview().inset(24)
 		}
+
+		summaryButton.snp.makeConstraints { make in
+			make.top.equalTo(summaryStackView.snp.bottom).offset(8)
+			make.trailing.equalToSuperview().inset(20)
+		}
 	}
 
 	required init?(coder: NSCoder) {
@@ -242,7 +273,8 @@ class BookView: UIView {
 		informRealesedLabel.text = formatting_strDate(str: book.release_date)
 		informPagesLabel.text = "\(book.pages)"
 		dedicationLabel.text = book.dedication
-		summaryLabel.text = book.summary
+		summaryString = book.summary
+		setSummaryStr()
 		makeChapters(chapters: book.chapters)
 	}
 
@@ -275,6 +307,26 @@ class BookView: UIView {
 		}
 
 		return "error"
+	}
+
+	private func setSummaryStr() {
+		if UserDefaults.standard.bool(forKey: "isOpenSummary") == false {
+			summaryLabel.text = String(summaryString.prefix(450)) + "..."
+		} else {
+			summaryLabel.text = summaryString
+		}
+	}
+
+	@objc func tapSummaryButton(_ sender: UIButton) {
+		let isOpenSummary = UserDefaults.standard.bool(forKey: "isOpenSummary")
+
+		if isOpenSummary {
+			UserDefaults.standard.set(false, forKey: "isOpenSummary")
+		} else {
+			UserDefaults.standard.set(true, forKey: "isOpenSummary")
+		}
+		setSummaryStr()
+		sender.isSelected.toggle()
 	}
 }
 
