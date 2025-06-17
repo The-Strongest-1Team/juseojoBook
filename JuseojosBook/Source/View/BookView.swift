@@ -123,6 +123,21 @@ class BookView: UIView {
 		$0.numberOfLines = 0
 	}
 
+	let bookScrollView = UIScrollView().then {
+		$0.showsVerticalScrollIndicator = false
+	}
+
+	let chapterStackView = UIStackView().then {
+		$0.axis = .vertical
+		$0.spacing = 8
+	}
+
+	let chapterTitleLabel = UILabel().then {
+		$0.font = UIFont.systemFont(ofSize: 18, weight: .bold)
+		$0.text = "Chapters"
+	}
+
+
 	override init(frame: CGRect) {
 		super.init(frame: frame)
 
@@ -132,7 +147,9 @@ class BookView: UIView {
 		addSubview(seriesView)
 		seriesView.addSubview(seriesButton)
 
-		addSubview(informView)
+		addSubview(bookScrollView)
+
+		bookScrollView.addSubview(informView)
 		informView.addSubview(bookImageView)
 		informView.addSubview(informStackView)
 
@@ -148,13 +165,16 @@ class BookView: UIView {
 		pagesStackview.addArrangedSubview(informPagesTitleLabel)
 		pagesStackview.addArrangedSubview(informPagesLabel)
 
-		addSubview(dedicationStackView)
+		bookScrollView.addSubview(dedicationStackView)
 		dedicationStackView.addArrangedSubview(dedicationTitleLabel)
 		dedicationStackView.addArrangedSubview(dedicationLabel)
 
-		addSubview(summaryStackView)
+		bookScrollView.addSubview(summaryStackView)
 		summaryStackView.addArrangedSubview(summaryTitleLabel)
 		summaryStackView.addArrangedSubview(summaryLabel)
+
+		bookScrollView.addSubview(chapterStackView)
+		chapterStackView.addArrangedSubview(chapterTitleLabel)
 
 		titleLabel.snp.makeConstraints { make in
 			make.top.equalTo(self.safeAreaLayoutGuide).inset(10)
@@ -172,8 +192,13 @@ class BookView: UIView {
 			make.width.height.equalTo(48)
 		}
 
-		informView.snp.makeConstraints { make in
+		bookScrollView.snp.makeConstraints { make in
 			make.top.equalTo(seriesView.snp.bottom).offset(10)
+			make.leading.trailing.bottom.equalToSuperview()
+		}
+
+		informView.snp.makeConstraints { make in
+			make.top.equalToSuperview()
 			make.leading.trailing.equalTo(self.safeAreaLayoutGuide).inset(5)
 			make.bottom.equalTo(bookImageView)
 		}
@@ -191,12 +216,18 @@ class BookView: UIView {
 
 		dedicationStackView.snp.makeConstraints { make in
 			make.top.equalTo(informStackView.snp.bottom).offset(24)
-			make.leading.trailing.equalToSuperview().inset(20)
+			make.leading.trailing.equalTo(self).inset(20)
 		}
 
 		summaryStackView.snp.makeConstraints { make in
 			make.top.equalTo(dedicationStackView.snp.bottom).offset(24)
-			make.leading.trailing.equalToSuperview().inset(20)
+			make.leading.trailing.equalTo(self).inset(20)
+		}
+
+		chapterStackView.snp.makeConstraints { make in
+			make.top.equalTo(summaryStackView.snp.bottom).offset(24)
+			make.leading.trailing.equalTo(self).inset(20)
+			make.bottom.equalToSuperview().inset(24)
 		}
 	}
 
@@ -212,6 +243,20 @@ class BookView: UIView {
 		informPagesLabel.text = "\(book.pages)"
 		dedicationLabel.text = book.dedication
 		summaryLabel.text = book.summary
+		makeChapters(chapters: book.chapters)
+	}
+
+	private func makeChapters(chapters: [Chapter]) {
+		for chapter in chapters {
+			let chapterLabel = UILabel().then {
+				$0.font = .systemFont(ofSize: 14, weight: .medium)
+				$0.textColor = .darkGray
+				$0.text = chapter.title
+				$0.numberOfLines = 0
+			}
+
+			chapterStackView.addArrangedSubview(chapterLabel)
+		}
 	}
 
 	private func formatting_strDate(str: String) -> String {
