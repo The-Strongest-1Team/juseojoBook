@@ -91,38 +91,6 @@ class BookView: UIView {
 		$0.textColor = .gray
 	}
 
-	let dedicationStackView = UIStackView().then {
-		$0.axis = .vertical
-		$0.spacing = 8
-	}
-
-	let dedicationTitleLabel = UILabel().then {
-		$0.font = UIFont.systemFont(ofSize: 18, weight: .bold)
-		$0.text = "Dedication"
-	}
-
-	let dedicationLabel = UILabel().then {
-		$0.font = UIFont.systemFont(ofSize: 14, weight: .regular)
-		$0.textColor = .darkGray
-		$0.numberOfLines = 0
-	}
-
-	let summaryStackView = UIStackView().then {
-		$0.axis = .vertical
-		$0.spacing = 8
-	}
-
-	let summaryTitleLabel = UILabel().then {
-		$0.font = UIFont.systemFont(ofSize: 18, weight: .bold)
-		$0.text = "Summary"
-	}
-
-	let summaryLabel = UILabel().then {
-		$0.font = UIFont.systemFont(ofSize: 14, weight: .regular)
-		$0.textColor = .darkGray
-		$0.numberOfLines = 0
-	}
-
 	override init(frame: CGRect) {
 		super.init(frame: frame)
 
@@ -147,14 +115,6 @@ class BookView: UIView {
 		releasedStackview.addArrangedSubview(informRealesedLabel)
 		pagesStackview.addArrangedSubview(informPagesTitleLabel)
 		pagesStackview.addArrangedSubview(informPagesLabel)
-
-		addSubview(dedicationStackView)
-		dedicationStackView.addArrangedSubview(dedicationTitleLabel)
-		dedicationStackView.addArrangedSubview(dedicationLabel)
-
-		addSubview(summaryStackView)
-		summaryStackView.addArrangedSubview(summaryTitleLabel)
-		summaryStackView.addArrangedSubview(summaryLabel)
 
 		titleLabel.snp.makeConstraints { make in
 			make.top.equalTo(self.safeAreaLayoutGuide).inset(10)
@@ -188,16 +148,6 @@ class BookView: UIView {
 			make.top.bottom.trailing.equalToSuperview()
 			make.leading.equalTo(bookImageView.snp.trailing).offset(10)
 		}
-
-		dedicationStackView.snp.makeConstraints { make in
-			make.top.equalTo(informStackView.snp.bottom).offset(24)
-			make.leading.trailing.equalToSuperview().inset(20)
-		}
-
-		summaryStackView.snp.makeConstraints { make in
-			make.top.equalTo(dedicationStackView.snp.bottom).offset(24)
-			make.leading.trailing.equalToSuperview().inset(20)
-		}
 	}
 
 	required init?(coder: NSCoder) {
@@ -210,8 +160,6 @@ class BookView: UIView {
 		informAuthorLabel.text = book.author
 		informRealesedLabel.text = formatting_strDate(str: book.release_date)
 		informPagesLabel.text = "\(book.pages)"
-		dedicationLabel.text = book.dedication
-		summaryLabel.text = book.summary
 	}
 
 	private func formatting_strDate(str: String) -> String {
