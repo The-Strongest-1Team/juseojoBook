@@ -25,4 +25,8 @@ struct BookViewModel {
 			}
 		}
 	}
+
+	func requestData(index: Int) {
+		self.bookPublisher?.send(books![index])
+	}
 }
