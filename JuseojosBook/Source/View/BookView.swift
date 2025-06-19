@@ -208,7 +208,7 @@ class BookView: UIView {
 		bookScrollView.addSubview(chapterStackView)
 		chapterStackView.addArrangedSubview(chapterTitleLabel)
 
-		addSubview(summaryButton)
+		bookScrollView.addSubview(summaryButton)
 
 		// MARK: - Layout
 		titleLabel.snp.makeConstraints { make in
@@ -218,17 +218,18 @@ class BookView: UIView {
 
 		seriesStackView.snp.makeConstraints { make in
 			make.top.equalTo(titleLabel.snp.bottom).offset(16)
-			make.leading.trailing.equalToSuperview().inset(20)
+			make.width.equalTo(UIScreen.main.bounds.width - 40)
+			make.centerX.equalToSuperview()
 		}
 
 		bookScrollView.snp.makeConstraints { make in
 			make.top.equalTo(seriesStackView.snp.bottom).offset(24)
-			make.leading.trailing.bottom.equalToSuperview()
+			make.leading.trailing.bottom.equalTo(self.safeAreaLayoutGuide)
 		}
 
 		informView.snp.makeConstraints { make in
 			make.top.equalToSuperview()
-			make.leading.trailing.equalTo(self.safeAreaLayoutGuide).inset(20)
+			make.leading.trailing.equalTo(bookScrollView.frameLayoutGuide).inset(20)
 			make.bottom.equalTo(bookImageView)
 		}
 
@@ -245,23 +246,23 @@ class BookView: UIView {
 
 		dedicationStackView.snp.makeConstraints { make in
 			make.top.equalTo(informStackView.snp.bottom).offset(24)
-			make.leading.trailing.equalTo(self).inset(20)
+			make.leading.trailing.equalTo(bookScrollView.frameLayoutGuide).inset(20)
 		}
 
 		summaryStackView.snp.makeConstraints { make in
 			make.top.equalTo(dedicationStackView.snp.bottom).offset(24)
-			make.leading.trailing.equalTo(self).inset(20)
+			make.leading.trailing.equalTo(bookScrollView.frameLayoutGuide).inset(20)
 		}
 
 		chapterStackView.snp.makeConstraints { make in
 			make.top.equalTo(summaryStackView.snp.bottom).offset(24)
-			make.leading.trailing.equalTo(self).inset(20)
+			make.leading.trailing.equalTo(bookScrollView.frameLayoutGuide).inset(20)
 			make.bottom.equalToSuperview().inset(24)
 		}
 
 		summaryButton.snp.makeConstraints { make in
 			make.top.equalTo(summaryStackView.snp.bottom).offset(8)
-			make.trailing.equalToSuperview().inset(20)
+			make.trailing.equalTo(self.safeAreaLayoutGuide).inset(20)
 		}
 
 		makeSeriesButtons()
