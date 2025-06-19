@@ -17,15 +17,12 @@ class BookView: UIView {
 		$0.numberOfLines = 0
 	}
 
-	let seriesView = UIView()
-
-	let seriesButton = UIButton(configuration: .filled()).then {
-		$0.configuration?.title = "1"
-		$0.configuration?.titleAlignment = .center
-		$0.configuration?.cornerStyle = .capsule
-		$0.configuration?.baseBackgroundColor = .systemBlue
-		$0.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .regular)
+	let seriesStackView = UIStackView().then {
+		$0.axis = .horizontal
+		$0.spacing = 8
 	}
+
+	var seriesButtons = [UIButton]()
 
 	let informView = UIView()
 
@@ -142,11 +139,6 @@ class BookView: UIView {
 		$0.setTitle("접기", for: .selected)
 		$0.setTitleColor(.systemBlue, for: .normal)
 		$0.isHidden = true
-		if UserDefaults.standard.bool(forKey: "isOpenSummary") {
-			$0.isSelected = true
-		} else {
-			$0.isSelected = false
-		}
 	}
 
 	var summaryString = "" {
@@ -161,15 +153,31 @@ class BookView: UIView {
 		}
 	}
 
+	weak var delegate: (BookViewDelegate)?
+
 	override init(frame: CGRect) {
 		super.init(frame: frame)
 
 		self.backgroundColor = .white
+
 		summaryButton.addTarget(self, action: #selector(tapSummaryButton), for: .touchUpInside)
-		
+
+		// Setting summrays UserDefaults and isSelected
+		if UserDefaults.standard.array(forKey: "isOpenSummarys") == nil {
+			UserDefaults.standard.set(Array(repeating: false, count: 7), forKey: "isOpenSummarys")
+		}
+
+		let isOpenSummarys = getIsOpenSummarys()
+
+		if isOpenSummarys[getSelectedButtonNum() - 1] {
+			summaryButton.isSelected = true
+		} else {
+			summaryButton.isSelected = false
+		}
+
+		// MARK: - Add UI component
 		addSubview(titleLabel)
-		addSubview(seriesView)
-		seriesView.addSubview(seriesButton)
+		addSubview(seriesStackView)
 
 		addSubview(bookScrollView)
 
@@ -202,30 +210,25 @@ class BookView: UIView {
 
 		addSubview(summaryButton)
 
+		// MARK: - Layout
 		titleLabel.snp.makeConstraints { make in
 			make.top.equalTo(self.safeAreaLayoutGuide).inset(10)
 			make.leading.trailing.equalToSuperview().inset(20)
 		}
 
-		seriesView.snp.makeConstraints { make in
+		seriesStackView.snp.makeConstraints { make in
 			make.top.equalTo(titleLabel.snp.bottom).offset(16)
 			make.leading.trailing.equalToSuperview().inset(20)
-			make.bottom.equalTo(seriesButton.snp.bottom)
-		}
-
-		seriesButton.snp.makeConstraints { make in
-			make.top.centerX.equalToSuperview()
-			make.width.height.equalTo(48)
 		}
 
 		bookScrollView.snp.makeConstraints { make in
-			make.top.equalTo(seriesView.snp.bottom).offset(10)
+			make.top.equalTo(seriesStackView.snp.bottom).offset(24)
 			make.leading.trailing.bottom.equalToSuperview()
 		}
 
 		informView.snp.makeConstraints { make in
 			make.top.equalToSuperview()
-			make.leading.trailing.equalTo(self.safeAreaLayoutGuide).inset(5)
+			make.leading.trailing.equalTo(self.safeAreaLayoutGuide).inset(20)
 			make.bottom.equalTo(bookImageView)
 		}
 
@@ -260,12 +263,14 @@ class BookView: UIView {
 			make.top.equalTo(summaryStackView.snp.bottom).offset(8)
 			make.trailing.equalToSuperview().inset(20)
 		}
+
+		makeSeriesButtons()
 	}
 
 	required init?(coder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
-
+	// MARK: - Methods
 	func configure(book: Book) {
 		titleLabel.text = book.title
 		informTitleLabel.text = book.title
@@ -275,7 +280,23 @@ class BookView: UIView {
 		dedicationLabel.text = book.dedication
 		summaryString = book.summary
 		setSummaryStr()
+		chapterStackView.arrangedSubviews.dropFirst().forEach { view in
+			view.removeFromSuperview()
+		}
 		makeChapters(chapters: book.chapters)
+		bookImageView.image = UIImage(named: "harrypotter\(getSelectedButtonNum())")
+		let isOpenSummarys = (UserDefaults.standard.array(forKey: "isOpenSummarys") as? [Bool]) ?? Array(repeating: false, count: 7)
+		summaryButton.isSelected = isOpenSummarys[getSelectedButtonNum() - 1]
+	}
+
+	private func getSelectedButtonNum() -> Int {
+		for seriesButton in seriesButtons {
+			if seriesButton.isSelected {
+				return seriesButton.tag
+			}
+		}
+
+		return 1
 	}
 
 	private func makeChapters(chapters: [Chapter]) {
@@ -288,6 +309,42 @@ class BookView: UIView {
 			}
 
 			chapterStackView.addArrangedSubview(chapterLabel)
+		}
+	}
+
+	private func makeSeriesButtons() {
+		for i in 1...7 {
+			let seriesButton = UIButton(configuration: .filled()).then {
+				$0.tag = i
+				$0.configurationUpdateHandler = { button in
+					var config = button.configuration ?? .filled()
+					config.title = "\(button.tag)"
+					config.titleAlignment = .center
+					config.cornerStyle = .capsule
+
+					switch button.state {
+					case .selected:
+						config.baseBackgroundColor = .systemBlue
+						config.baseForegroundColor = .systemGray5
+					default:
+						config.baseBackgroundColor = .systemGray5
+						config.baseForegroundColor = .systemBlue
+					}
+					button.configuration = config
+				}
+
+				if i == 1 {
+					$0.isSelected = true
+				}
+			}
+
+			seriesButtons.append(seriesButton)
+			seriesStackView.addArrangedSubview(seriesButton)
+			seriesButton.snp.makeConstraints { make in
+				make.height.equalTo(seriesButton.snp.width)
+			}
+
+			seriesButton.addTarget(self, action: #selector(seriesButtonTapped), for: .touchUpInside)
 		}
 	}
 
@@ -310,24 +367,45 @@ class BookView: UIView {
 	}
 
 	private func setSummaryStr() {
-		if UserDefaults.standard.bool(forKey: "isOpenSummary") == false {
+		let isOpenSummarys = getIsOpenSummarys()
+
+		if !isOpenSummarys[getSelectedButtonNum() - 1] && summaryString.count >= 450 {
 			summaryLabel.text = String(summaryString.prefix(450)) + "..."
 		} else {
 			summaryLabel.text = summaryString
 		}
 	}
+	private func getIsOpenSummarys() -> [Bool] {
+		return (UserDefaults.standard.array(forKey: "isOpenSummarys") as? [Bool]) ?? Array(repeating: false, count: 7)
+	}
 
+	// MARK: - Button event method
 	@objc func tapSummaryButton(_ sender: UIButton) {
-		let isOpenSummary = UserDefaults.standard.bool(forKey: "isOpenSummary")
+		var isOpenSummarys = getIsOpenSummarys()
 
-		if isOpenSummary {
-			UserDefaults.standard.set(false, forKey: "isOpenSummary")
+		if isOpenSummarys[getSelectedButtonNum() - 1] {
+			isOpenSummarys[getSelectedButtonNum() - 1] = false
+			UserDefaults.standard.set(isOpenSummarys, forKey: "isOpenSummarys")
 		} else {
-			UserDefaults.standard.set(true, forKey: "isOpenSummary")
+			isOpenSummarys[getSelectedButtonNum() - 1] = true
+			UserDefaults.standard.set(isOpenSummarys, forKey: "isOpenSummarys")
 		}
 		setSummaryStr()
 		sender.isSelected.toggle()
 	}
+
+	@objc func seriesButtonTapped(_ sender: UIButton) {
+		guard !sender.isSelected else { return }
+		for button in seriesButtons {
+			button.isSelected = (button == sender)
+		}
+		delegate?.didTapButton(sender)
+		print("tap \(sender.tag)")
+	}
+}
+// MARK: - delegate
+protocol BookViewDelegate: AnyObject {
+	func didTapButton(_ sender: UIButton)
 }
 
 // MARK: - BookViewController Preview
