@@ -160,112 +160,14 @@ class BookView: UIView {
 
 		self.backgroundColor = .white
 
-		summaryButton.addTarget(self, action: #selector(tapSummaryButton), for: .touchUpInside)
-
-		// Setting summrays UserDefaults and isSelected
-		if UserDefaults.standard.array(forKey: "isOpenSummarys") == nil {
-			UserDefaults.standard.set(Array(repeating: false, count: 7), forKey: "isOpenSummarys")
-		}
-
-		let isOpenSummarys = getIsOpenSummarys()
-
-		if isOpenSummarys[getSelectedButtonNum() - 1] {
-			summaryButton.isSelected = true
-		} else {
-			summaryButton.isSelected = false
-		}
-
-		// MARK: - Add UI component
-		addSubview(titleLabel)
-		addSubview(seriesStackView)
-
-		addSubview(bookScrollView)
-
-		bookScrollView.addSubview(informView)
-		informView.addSubview(bookImageView)
-		informView.addSubview(informStackView)
-
-		informStackView.addArrangedSubview(informTitleLabel)
-		informStackView.addArrangedSubview(authorStackview)
-		informStackView.addArrangedSubview(releasedStackview)
-		informStackView.addArrangedSubview(pagesStackview)
-
-		authorStackview.addArrangedSubview(informAuthorTitleLabel)
-		authorStackview.addArrangedSubview(informAuthorLabel)
-		releasedStackview.addArrangedSubview(informRealesedTitleLabel)
-		releasedStackview.addArrangedSubview(informRealesedLabel)
-		pagesStackview.addArrangedSubview(informPagesTitleLabel)
-		pagesStackview.addArrangedSubview(informPagesLabel)
-
-		bookScrollView.addSubview(dedicationStackView)
-		dedicationStackView.addArrangedSubview(dedicationTitleLabel)
-		dedicationStackView.addArrangedSubview(dedicationLabel)
-
-		bookScrollView.addSubview(summaryStackView)
-		summaryStackView.addArrangedSubview(summaryTitleLabel)
-		summaryStackView.addArrangedSubview(summaryLabel)
-
-		bookScrollView.addSubview(chapterStackView)
-		chapterStackView.addArrangedSubview(chapterTitleLabel)
-
-		bookScrollView.addSubview(summaryButton)
-
-		// MARK: - Layout
-		titleLabel.snp.makeConstraints { make in
-			make.top.equalTo(self.safeAreaLayoutGuide).inset(10)
-			make.leading.trailing.equalToSuperview().inset(20)
-		}
-
-		seriesStackView.snp.makeConstraints { make in
-			make.top.equalTo(titleLabel.snp.bottom).offset(16)
-			make.width.equalTo(UIScreen.main.bounds.width - 40)
-			make.centerX.equalToSuperview()
-		}
-
-		bookScrollView.snp.makeConstraints { make in
-			make.top.equalTo(seriesStackView.snp.bottom).offset(24)
-			make.leading.trailing.bottom.equalTo(self.safeAreaLayoutGuide)
-		}
-
-		informView.snp.makeConstraints { make in
-			make.top.equalToSuperview()
-			make.leading.trailing.equalTo(bookScrollView.frameLayoutGuide).inset(20)
-			make.bottom.equalTo(bookImageView)
-		}
-
-		bookImageView.snp.makeConstraints { make in
-			make.top.leading.equalToSuperview()
-			make.width.equalTo(100)
-			make.height.equalTo(bookImageView.snp.width).multipliedBy(1.5)
-		}
-
-		informStackView.snp.makeConstraints { make in
-			make.top.bottom.trailing.equalToSuperview()
-			make.leading.equalTo(bookImageView.snp.trailing).offset(10)
-		}
-
-		dedicationStackView.snp.makeConstraints { make in
-			make.top.equalTo(informStackView.snp.bottom).offset(24)
-			make.leading.trailing.equalTo(bookScrollView.frameLayoutGuide).inset(20)
-		}
-
-		summaryStackView.snp.makeConstraints { make in
-			make.top.equalTo(dedicationStackView.snp.bottom).offset(24)
-			make.leading.trailing.equalTo(bookScrollView.frameLayoutGuide).inset(20)
-		}
-
-		chapterStackView.snp.makeConstraints { make in
-			make.top.equalTo(summaryStackView.snp.bottom).offset(24)
-			make.leading.trailing.equalTo(bookScrollView.frameLayoutGuide).inset(20)
-			make.bottom.equalToSuperview().inset(24)
-		}
-
-		summaryButton.snp.makeConstraints { make in
-			make.top.equalTo(summaryStackView.snp.bottom).offset(8)
-			make.trailing.equalTo(self.safeAreaLayoutGuide).inset(20)
-		}
-
+		// MARK: - set UI component
+		setHeaderUI()
+		setInformUI()
+		setScrollUI()
 		makeSeriesButtons()
+		setDedicationUI()
+		setSummaryUI()
+		setChaptersUI()
 	}
 
 	required init?(coder: NSCoder) {
@@ -288,6 +190,121 @@ class BookView: UIView {
 		bookImageView.image = UIImage(named: "harrypotter\(getSelectedButtonNum())")
 		let isOpenSummarys = (UserDefaults.standard.array(forKey: "isOpenSummarys") as? [Bool]) ?? Array(repeating: false, count: 7)
 		summaryButton.isSelected = isOpenSummarys[getSelectedButtonNum() - 1]
+	}
+
+	// MARK: - Layout Methods
+	private func setScrollUI() {
+		addSubview(bookScrollView)
+
+		bookScrollView.snp.makeConstraints { make in
+			make.top.equalTo(seriesStackView.snp.bottom).offset(24)
+			make.leading.trailing.bottom.equalTo(self.safeAreaLayoutGuide)
+		}
+	}
+
+	private func setChaptersUI() {
+		bookScrollView.addSubview(chapterStackView)
+		chapterStackView.addArrangedSubview(chapterTitleLabel)
+
+		chapterStackView.snp.makeConstraints { make in
+			make.top.equalTo(summaryStackView.snp.bottom).offset(24)
+			make.leading.trailing.equalTo(bookScrollView.frameLayoutGuide).inset(20)
+			make.bottom.equalToSuperview().inset(24)
+		}
+	}
+
+	private func setSummaryUI() {
+		bookScrollView.addSubview(summaryStackView)
+		summaryStackView.addArrangedSubview(summaryTitleLabel)
+		summaryStackView.addArrangedSubview(summaryLabel)
+		bookScrollView.addSubview(summaryButton)
+
+		// Setting summrays UserDefaults and isSelected
+		if UserDefaults.standard.array(forKey: "isOpenSummarys") == nil {
+			UserDefaults.standard.set(Array(repeating: false, count: 7), forKey: "isOpenSummarys")
+		}
+
+		let isOpenSummarys = getIsOpenSummarys()
+
+		if isOpenSummarys[getSelectedButtonNum() - 1] {
+			summaryButton.isSelected = true
+		} else {
+			summaryButton.isSelected = false
+		}
+
+		summaryButton.addTarget(self, action: #selector(tapSummaryButton), for: .touchUpInside)
+
+		summaryStackView.snp.makeConstraints { make in
+			make.top.equalTo(dedicationStackView.snp.bottom).offset(24)
+			make.leading.trailing.equalTo(bookScrollView.frameLayoutGuide).inset(20)
+		}
+
+		summaryButton.snp.makeConstraints { make in
+			make.top.equalTo(summaryStackView.snp.bottom).offset(8)
+			make.trailing.equalTo(self.safeAreaLayoutGuide).inset(20)
+		}
+	}
+
+	private func setDedicationUI() {
+		bookScrollView.addSubview(dedicationStackView)
+		dedicationStackView.addArrangedSubview(dedicationTitleLabel)
+		dedicationStackView.addArrangedSubview(dedicationLabel)
+
+		dedicationStackView.snp.makeConstraints { make in
+			make.top.equalTo(informStackView.snp.bottom).offset(24)
+			make.leading.trailing.equalTo(bookScrollView.frameLayoutGuide).inset(20)
+		}
+	}
+
+	private func setInformUI() {
+		bookScrollView.addSubview(informView)
+		informView.addSubview(bookImageView)
+		informView.addSubview(informStackView)
+
+		informStackView.addArrangedSubview(informTitleLabel)
+		informStackView.addArrangedSubview(authorStackview)
+		informStackView.addArrangedSubview(releasedStackview)
+		informStackView.addArrangedSubview(pagesStackview)
+
+		authorStackview.addArrangedSubview(informAuthorTitleLabel)
+		authorStackview.addArrangedSubview(informAuthorLabel)
+		releasedStackview.addArrangedSubview(informRealesedTitleLabel)
+		releasedStackview.addArrangedSubview(informRealesedLabel)
+		pagesStackview.addArrangedSubview(informPagesTitleLabel)
+		pagesStackview.addArrangedSubview(informPagesLabel)
+
+		informView.snp.makeConstraints { make in
+			make.top.equalToSuperview()
+			make.leading.trailing.equalTo(bookScrollView.frameLayoutGuide).inset(20)
+			make.bottom.equalTo(bookImageView)
+		}
+
+		bookImageView.snp.makeConstraints { make in
+			make.top.leading.equalToSuperview()
+			make.width.equalTo(100)
+			make.height.equalTo(bookImageView.snp.width).multipliedBy(1.5)
+		}
+
+		informStackView.snp.makeConstraints { make in
+			make.top.bottom.trailing.equalToSuperview()
+			make.leading.equalTo(bookImageView.snp.trailing).offset(10)
+		}
+	}
+
+	private func setHeaderUI() {
+		addSubview(titleLabel)
+		addSubview(seriesStackView)
+
+		titleLabel.snp.makeConstraints { make in
+			make.top.equalTo(self.safeAreaLayoutGuide).inset(10)
+			make.leading.trailing.equalToSuperview().inset(20)
+		}
+
+		seriesStackView.snp.makeConstraints { make in
+			make.top.equalTo(titleLabel.snp.bottom).offset(16)
+			make.width.equalTo(UIScreen.main.bounds.width - 40)
+			make.centerX.equalToSuperview()
+		}
 	}
 
 	private func getSelectedButtonNum() -> Int {
