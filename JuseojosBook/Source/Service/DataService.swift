@@ -21,9 +21,10 @@ class DataService {
 
 		do {
 			let data = try Data(contentsOf: URL(fileURLWithPath: path))
-			let bookResponse = try JSONDecoder().decode(BookResponse.self, from: data)
-			let books = bookResponse.data.map { $0.attributes }
-			completion(.success(books))
+			let decoder = JSONDecoder()
+			decoder.dateDecodingStrategy = .formatted(DateFormatter.yyyyMMdd)
+			let bookResponse = try decoder.decode(BookResponse.self, from: data)
+			completion(.success(bookResponse.data))
 		} catch {
 			print("🚨 JSON 파싱 에러 : \(error)")
 			completion(.failure(DataError.parsingFailed))

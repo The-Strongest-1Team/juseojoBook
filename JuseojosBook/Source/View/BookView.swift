@@ -141,46 +141,135 @@ class BookView: UIView {
 		$0.isHidden = true
 	}
 
-	var summaryString = "" {
+	private var summaryString = "" {
 		willSet(newVal) {
-			DispatchQueue.main.async {
-				if newVal.count >= 450 {
-					self.summaryButton.isHidden = false
-				} else {
-					self.summaryButton.isHidden = true
-				}
+			if newVal.count >= 450 {
+				self.summaryButton.isHidden = false
+			} else {
+				self.summaryButton.isHidden = true
 			}
 		}
 	}
 
+	private var selectedBookIndex = 0
+	let summarysKey = "isOpenSummarys"
 	weak var delegate: (BookViewDelegate)?
+	var openStates: [Bool] {
+		get { UserDefaults.standard.array(forKey: summarysKey) as? [Bool] ?? Array(repeating: false, count: 7) }
+		set { UserDefaults.standard.set(newValue, forKey: summarysKey) }
+	}
 
 	override init(frame: CGRect) {
 		super.init(frame: frame)
 
 		self.backgroundColor = .white
 
-		summaryButton.addTarget(self, action: #selector(tapSummaryButton), for: .touchUpInside)
+		// MARK: - set UI component
+		setHeaderUI()
+		setInformUI()
+		setScrollUI()
+		makeSeriesButtons()
+		setDedicationUI()
+		setSummaryUI()
+		setChaptersUI()
+	}
+
+	required init?(coder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
+	// MARK: - Methods
+	func configure(book: IndexedBook) {
+		// set data
+		titleLabel.text = book.title
+		informTitleLabel.text = book.title
+		informAuthorLabel.text = book.author
+		informRealesedLabel.text = DateFormatter.MMMMdyyyy.string(from: book.releaseDate)
+		informPagesLabel.text = "\(book.pages)"
+		dedicationLabel.text = book.dedication
+		selectedBookIndex = book.index
+		summaryString = book.summary
+		bookImageView.image = UIImage(named: "harrypotter\(selectedBookIndex + 1)")
+
+		// reset chapters
+		chapterStackView.arrangedSubviews.dropFirst().forEach { view in
+			view.removeFromSuperview()
+		}
+		// add chapters
+		makeChapters(chapters: book.chapters)
+
+		// set button state
+		summaryButton.isSelected = openStates[selectedBookIndex]
+
+		// set summaryLabel text
+		if !openStates[selectedBookIndex] {
+			summaryLabel.text = summaryString.summary(until: 450)
+		} else {
+			summaryLabel.text = summaryString
+		}
+	}
+
+	// MARK: - Layout Methods
+	private func setScrollUI() {
+		addSubview(bookScrollView)
+
+		bookScrollView.snp.makeConstraints { make in
+			make.top.equalTo(seriesStackView.snp.bottom).offset(24)
+			make.leading.trailing.bottom.equalTo(self.safeAreaLayoutGuide)
+		}
+	}
+
+	private func setChaptersUI() {
+		bookScrollView.addSubview(chapterStackView)
+		chapterStackView.addArrangedSubview(chapterTitleLabel)
+
+		chapterStackView.snp.makeConstraints { make in
+			make.top.equalTo(summaryButton.snp.bottom).offset(12)
+			make.leading.trailing.equalTo(bookScrollView.frameLayoutGuide).inset(20)
+			make.bottom.equalToSuperview().inset(24)
+		}
+	}
+
+	private func setSummaryUI() {
+		bookScrollView.addSubview(summaryStackView)
+		summaryStackView.addArrangedSubview(summaryTitleLabel)
+		summaryStackView.addArrangedSubview(summaryLabel)
+		bookScrollView.addSubview(summaryButton)
 
 		// Setting summrays UserDefaults and isSelected
-		if UserDefaults.standard.array(forKey: "isOpenSummarys") == nil {
-			UserDefaults.standard.set(Array(repeating: false, count: 7), forKey: "isOpenSummarys")
+		if UserDefaults.standard.array(forKey: summarysKey) == nil {
+			UserDefaults.standard.set(Array(repeating: false, count: 7), forKey: summarysKey)
 		}
-
-		let isOpenSummarys = getIsOpenSummarys()
-
-		if isOpenSummarys[getSelectedButtonNum() - 1] {
+		if openStates[selectedBookIndex] {
 			summaryButton.isSelected = true
 		} else {
 			summaryButton.isSelected = false
 		}
 
-		// MARK: - Add UI component
-		addSubview(titleLabel)
-		addSubview(seriesStackView)
+		summaryButton.addTarget(self, action: #selector(tapSummaryButton), for: .touchUpInside)
 
-		addSubview(bookScrollView)
+		summaryStackView.snp.makeConstraints { make in
+			make.top.equalTo(dedicationStackView.snp.bottom).offset(24)
+			make.leading.trailing.equalTo(bookScrollView.frameLayoutGuide).inset(20)
+		}
 
+		summaryButton.snp.makeConstraints { make in
+			make.top.equalTo(summaryStackView.snp.bottom).offset(8)
+			make.trailing.equalTo(self.safeAreaLayoutGuide).inset(20)
+		}
+	}
+
+	private func setDedicationUI() {
+		bookScrollView.addSubview(dedicationStackView)
+		dedicationStackView.addArrangedSubview(dedicationTitleLabel)
+		dedicationStackView.addArrangedSubview(dedicationLabel)
+
+		dedicationStackView.snp.makeConstraints { make in
+			make.top.equalTo(informStackView.snp.bottom).offset(24)
+			make.leading.trailing.equalTo(bookScrollView.frameLayoutGuide).inset(20)
+		}
+	}
+
+	private func setInformUI() {
 		bookScrollView.addSubview(informView)
 		informView.addSubview(bookImageView)
 		informView.addSubview(informStackView)
@@ -197,38 +286,9 @@ class BookView: UIView {
 		pagesStackview.addArrangedSubview(informPagesTitleLabel)
 		pagesStackview.addArrangedSubview(informPagesLabel)
 
-		bookScrollView.addSubview(dedicationStackView)
-		dedicationStackView.addArrangedSubview(dedicationTitleLabel)
-		dedicationStackView.addArrangedSubview(dedicationLabel)
-
-		bookScrollView.addSubview(summaryStackView)
-		summaryStackView.addArrangedSubview(summaryTitleLabel)
-		summaryStackView.addArrangedSubview(summaryLabel)
-
-		bookScrollView.addSubview(chapterStackView)
-		chapterStackView.addArrangedSubview(chapterTitleLabel)
-
-		addSubview(summaryButton)
-
-		// MARK: - Layout
-		titleLabel.snp.makeConstraints { make in
-			make.top.equalTo(self.safeAreaLayoutGuide).inset(10)
-			make.leading.trailing.equalToSuperview().inset(20)
-		}
-
-		seriesStackView.snp.makeConstraints { make in
-			make.top.equalTo(titleLabel.snp.bottom).offset(16)
-			make.leading.trailing.equalToSuperview().inset(20)
-		}
-
-		bookScrollView.snp.makeConstraints { make in
-			make.top.equalTo(seriesStackView.snp.bottom).offset(24)
-			make.leading.trailing.bottom.equalToSuperview()
-		}
-
 		informView.snp.makeConstraints { make in
 			make.top.equalToSuperview()
-			make.leading.trailing.equalTo(self.safeAreaLayoutGuide).inset(20)
+			make.leading.trailing.equalTo(bookScrollView.frameLayoutGuide).inset(20)
 			make.bottom.equalTo(bookImageView)
 		}
 
@@ -242,61 +302,22 @@ class BookView: UIView {
 			make.top.bottom.trailing.equalToSuperview()
 			make.leading.equalTo(bookImageView.snp.trailing).offset(10)
 		}
-
-		dedicationStackView.snp.makeConstraints { make in
-			make.top.equalTo(informStackView.snp.bottom).offset(24)
-			make.leading.trailing.equalTo(self).inset(20)
-		}
-
-		summaryStackView.snp.makeConstraints { make in
-			make.top.equalTo(dedicationStackView.snp.bottom).offset(24)
-			make.leading.trailing.equalTo(self).inset(20)
-		}
-
-		chapterStackView.snp.makeConstraints { make in
-			make.top.equalTo(summaryStackView.snp.bottom).offset(24)
-			make.leading.trailing.equalTo(self).inset(20)
-			make.bottom.equalToSuperview().inset(24)
-		}
-
-		summaryButton.snp.makeConstraints { make in
-			make.top.equalTo(summaryStackView.snp.bottom).offset(8)
-			make.trailing.equalToSuperview().inset(20)
-		}
-
-		makeSeriesButtons()
 	}
 
-	required init?(coder: NSCoder) {
-		fatalError("init(coder:) has not been implemented")
-	}
-	// MARK: - Methods
-	func configure(book: Book) {
-		titleLabel.text = book.title
-		informTitleLabel.text = book.title
-		informAuthorLabel.text = book.author
-		informRealesedLabel.text = formatting_strDate(str: book.release_date)
-		informPagesLabel.text = "\(book.pages)"
-		dedicationLabel.text = book.dedication
-		summaryString = book.summary
-		setSummaryStr()
-		chapterStackView.arrangedSubviews.dropFirst().forEach { view in
-			view.removeFromSuperview()
-		}
-		makeChapters(chapters: book.chapters)
-		bookImageView.image = UIImage(named: "harrypotter\(getSelectedButtonNum())")
-		let isOpenSummarys = (UserDefaults.standard.array(forKey: "isOpenSummarys") as? [Bool]) ?? Array(repeating: false, count: 7)
-		summaryButton.isSelected = isOpenSummarys[getSelectedButtonNum() - 1]
-	}
+	private func setHeaderUI() {
+		addSubview(titleLabel)
+		addSubview(seriesStackView)
 
-	private func getSelectedButtonNum() -> Int {
-		for seriesButton in seriesButtons {
-			if seriesButton.isSelected {
-				return seriesButton.tag
-			}
+		titleLabel.snp.makeConstraints { make in
+			make.top.equalTo(self.safeAreaLayoutGuide).inset(10)
+			make.leading.trailing.equalToSuperview().inset(20)
 		}
 
-		return 1
+		seriesStackView.snp.makeConstraints { make in
+			make.top.equalTo(titleLabel.snp.bottom).offset(16)
+			make.width.equalTo(UIScreen.main.bounds.width - 40)
+			make.centerX.equalToSuperview()
+		}
 	}
 
 	private func makeChapters(chapters: [Chapter]) {
@@ -348,49 +369,20 @@ class BookView: UIView {
 		}
 	}
 
-	private func formatting_strDate(str: String) -> String {
-		let inputFormatter = DateFormatter()
-		inputFormatter.dateFormat = "yyyy-MM-dd"
-
-		let outputFormatter = DateFormatter()
-		outputFormatter.dateFormat = "MMMM d, yyyy"
-		outputFormatter.locale = Locale(identifier: "en_US")
-
-		if let date = inputFormatter.date(from: str) {
-			let formattedString = outputFormatter.string(from: date)
-			return formattedString
+	// MARK: - Button event method
+	@objc func tapSummaryButton(_ sender: UIButton) {
+		if openStates[selectedBookIndex] {
+			openStates[selectedBookIndex] = false
 		} else {
-			print("Invalid date format")
+			openStates[selectedBookIndex] = true
 		}
 
-		return "error"
-	}
-
-	private func setSummaryStr() {
-		let isOpenSummarys = getIsOpenSummarys()
-
-		if !isOpenSummarys[getSelectedButtonNum() - 1] && summaryString.count >= 450 {
-			summaryLabel.text = String(summaryString.prefix(450)) + "..."
+		if !openStates[selectedBookIndex] {
+			summaryLabel.text = summaryString.summary(until: 450)
 		} else {
 			summaryLabel.text = summaryString
 		}
-	}
-	private func getIsOpenSummarys() -> [Bool] {
-		return (UserDefaults.standard.array(forKey: "isOpenSummarys") as? [Bool]) ?? Array(repeating: false, count: 7)
-	}
 
-	// MARK: - Button event method
-	@objc func tapSummaryButton(_ sender: UIButton) {
-		var isOpenSummarys = getIsOpenSummarys()
-
-		if isOpenSummarys[getSelectedButtonNum() - 1] {
-			isOpenSummarys[getSelectedButtonNum() - 1] = false
-			UserDefaults.standard.set(isOpenSummarys, forKey: "isOpenSummarys")
-		} else {
-			isOpenSummarys[getSelectedButtonNum() - 1] = true
-			UserDefaults.standard.set(isOpenSummarys, forKey: "isOpenSummarys")
-		}
-		setSummaryStr()
 		sender.isSelected.toggle()
 	}
 
