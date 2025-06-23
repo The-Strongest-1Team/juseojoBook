@@ -11,15 +11,20 @@ import Combine
 
 struct BookViewModel {
 	let dataServie = DataService()
-	var books: [Book]?
-	var bookPublisher: CurrentValueSubject<Book, Never>?
+	var books: [IndexedBook]?
+	var bookPublisher: CurrentValueSubject<IndexedBook, Never>?
 
 	init() {
 		dataServie.loadBooks { data in
 			switch data {
-			case .success(let book):
-				self.bookPublisher = .init(book[0])
-				self.books = book
+			case .success(let result):
+				self.books = result.enumerated().map(IndexedBook.init)
+				guard let firstBook = books?[0]
+				else {
+					print("error initBook")
+					return
+				}
+				self.bookPublisher = .init(firstBook)
 			case .failure(let error):
 				print(error)
 			}
