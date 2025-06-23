@@ -143,12 +143,10 @@ class BookView: UIView {
 
 	private var summaryString = "" {
 		willSet(newVal) {
-			DispatchQueue.main.async {
-				if newVal.count >= 450 {
-					self.summaryButton.isHidden = false
-				} else {
-					self.summaryButton.isHidden = true
-				}
+			if newVal.count >= 450 {
+				self.summaryButton.isHidden = false
+			} else {
+				self.summaryButton.isHidden = true
 			}
 		}
 	}
