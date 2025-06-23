@@ -11,7 +11,7 @@ import Combine
 
 struct BookViewModel {
 	let dataServie = DataService()
-	var books: [IndexedBook]?
+	private var books: [IndexedBook]?
 	var bookPublisher: CurrentValueSubject<IndexedBook, Never>?
 
 	init() {
