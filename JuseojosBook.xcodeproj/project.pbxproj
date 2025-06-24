@@ -9,10 +9,12 @@
 /* Begin PBXBuildFile section */
 		E93866E02DFBCA5200227101 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E93866DF2DFBCA5200227101 /* SnapKit */; };
 		E93866E32DFBCB0500227101 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = E93866E22DFBCB0500227101 /* Then */; };
+		E9B691052E0A311B00790213 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = E9B690F92E0A311B00790213 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		E997DADE2DF93F3E00CF1400 /* JuseojosBook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JuseojosBook.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E9B690F92E0A311B00790213 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -54,6 +56,7 @@
 			children = (
 				E997DAE02DF93F3E00CF1400 /* JuseojosBook */,
 				E997DADF2DF93F3E00CF1400 /* Products */,
+				E9B690F92E0A311B00790213 /* README.md */,
 			);
 			sourceTree = "<group>";
 		};
@@ -135,6 +138,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E9B691052E0A311B00790213 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
